@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" width="180" height="180">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0052d9;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1a2035;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- 背景 -->
+  <rect width="180" height="180" rx="40" fill="url(#grad)"/>
+  
+  <!-- 彩票图标 -->
+  <rect x="30" y="50" width="120" height="80" rx="8" fill="#fff" opacity="0.95"/>
+  <rect x="35" y="55" width="110" height="70" rx="6" fill="none" stroke="#0052d9" stroke-width="3"/>
+  
+  <!-- 数字球 -->
+  <circle cx="60" cy="80" r="8" fill="#0052d9"/>
+  <circle cx="90" cy="80" r="8" fill="#0052d9"/>
+  <circle cx="120" cy="80" r="8" fill="#0052d9"/>
+  
+  <!-- 分割线 -->
+  <line x1="45" y1="100" x2="135" y2="100" stroke="#0052d9" stroke-width="2" stroke-dasharray="4,2"/>
+  
+  <!-- 底部数字 -->
+  <circle cx="75" cy="115" r="6" fill="#1a2035"/>
+  <circle cx="105" cy="115" r="6" fill="#1a2035"/>
+  
+  <!-- 装饰元素 -->
+  <text x="90" y="45" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#fff">彩票</text>
+</svg>
