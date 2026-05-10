@@ -66,3 +66,21 @@ export const statisticsApi = {
   scratchTrend: (params: Record<string, unknown>) =>
     request.get("/statistics/scratch-trend", { params }),
 };
+
+/**
+ * 默认号码 API
+ * 用于管理和获取预设的默认投注号码
+ */
+export const defaultNumberApi = {
+  /** 获取所有默认号码 */
+  list: () => request.get("/default-numbers"),
+  /** 根据彩票模式ID获取默认号码列表 */
+  listByModeId: (modeId: number) => request.get(`/default-numbers/mode/${modeId}`),
+  /** 新增默认号码 */
+  create: (data: Record<string, unknown>) => request.post("/default-numbers", data),
+  /** 更新默认号码 */
+  update: (id: number, data: Record<string, unknown>) =>
+    request.put(`/default-numbers/${id}`, data),
+  /** 删除默认号码 */
+  delete: (id: number) => request.delete(`/default-numbers/${id}`),
+};

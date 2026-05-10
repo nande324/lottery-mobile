@@ -9,11 +9,10 @@ export interface LotteryMode {
   blueCount?: number;
   blueMin?: number;
   blueMax?: number;
-  unitPrice: number;
+  ticketPrice: number;
   description?: string;
-  enabled: boolean;
-  createdAt: string;
-  updatedAt: string;
+  createdTime: string;
+  updatedTime: string;
 }
 
 // 摇奖票

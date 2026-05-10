@@ -1,5 +1,6 @@
 import axios from "axios";
-import { Toast } from "tdesign-mobile-vue";
+import { ToastPlugin } from "tdesign-mobile-vue";
+const $toast = ToastPlugin;
 
 const request = axios.create({
   baseURL: "/api",
@@ -17,7 +18,7 @@ request.interceptors.response.use(
   (response) => {
     const data = response.data;
     if (data.code && data.code !== 200) {
-      Toast({ message: data.message || "请求失败", theme: "error" });
+      $toast({ message: data.message || "请求失败", theme: "error" });
       return Promise.reject(new Error(data.message));
     }
     return response;
@@ -27,7 +28,7 @@ request.interceptors.response.use(
       localStorage.removeItem("token");
       window.location.href = "/login";
     } else {
-      Toast({
+      $toast({
         message: error.response?.data?.message || "网络错误",
         theme: "error",
       });

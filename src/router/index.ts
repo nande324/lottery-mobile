@@ -42,6 +42,12 @@ const router = createRouter({
           meta: { title: "摇奖" },
         },
         {
+          path: "default-numbers",
+          name: "DefaultNumbers",
+          component: () => import("@/views/DefaultNumbersView.vue"),
+          meta: { title: "我的号码" },
+        },
+        {
           path: "scratch-tickets",
           name: "ScratchTickets",
           component: () => import("@/views/ScratchTicketsView.vue"),
