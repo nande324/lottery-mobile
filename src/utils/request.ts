@@ -26,7 +26,7 @@ request.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem("token");
-      window.location.href = "/login";
+      window.location.href = "/mobile/";
     } else {
       $toast({
         message: error.response?.data?.message || "网络错误",
