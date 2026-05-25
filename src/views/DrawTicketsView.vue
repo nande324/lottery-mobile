@@ -77,6 +77,12 @@
               <t-link
                 theme="primary"
                 size="small"
+                @click="openEditDialog(ticket)"
+                >编辑</t-link
+              >
+              <t-link
+                theme="primary"
+                size="small"
                 @click="openWinDialog(ticket)"
                 >设置中奖</t-link
               >
@@ -102,7 +108,7 @@
       </div>
     </t-pull-down-refresh>
 
-    <!-- 新增投注弹窗 -->
+    <!-- 新增/编辑投注弹窗 -->
     <t-popup
       v-model:visible="showAddSheet"
       placement="bottom"
@@ -110,7 +116,7 @@
     >
       <div class="popup-content">
         <div class="popup-header">
-          <span>新增摇奖票</span>
+          <span>{{ isEditingTicket ? "编辑摇奖票" : "新增摇奖票" }}</span>
           <t-icon name="close" @click="showAddSheet = false" />
         </div>
         <t-form
@@ -732,6 +738,10 @@ const genLoading = ref(false);
 const winLoading = ref(false);
 const winCurrentId = ref<number | null>(null);
 
+// 编辑相关
+const isEditingTicket = ref(false);
+const editingTicketId = ref<number | null>(null);
+
 // 当前选中的默认号码ID（用于高亮显示）
 const selectedDefaultNumberId = ref<number | null>(null);
 
@@ -1191,14 +1201,27 @@ async function handleFormSubmit({ valid, firstError }: any) {
 
   addLoading.value = true;
   try {
-    await drawTicketApi.create({
-      modeId: addForm.modeId,
-      issueNo: addForm.issueNo || undefined,
-      redNumbers,
-      blueNumbers: blueNumbers.length ? blueNumbers : undefined,
-      betAmount: addForm.betAmount,
-    });
-    Toast({ message: "保存成功", theme: "success" });
+    if (isEditingTicket.value && editingTicketId.value) {
+      // 编辑模式
+      await drawTicketApi.update(editingTicketId.value, {
+        modeId: addForm.modeId,
+        issueNo: addForm.issueNo || undefined,
+        redNumbers,
+        blueNumbers: blueNumbers.length ? blueNumbers : undefined,
+        betAmount: addForm.betAmount,
+      });
+      Toast({ message: "更新成功", theme: "success" });
+    } else {
+      // 新增模式
+      await drawTicketApi.create({
+        modeId: addForm.modeId,
+        issueNo: addForm.issueNo || undefined,
+        redNumbers,
+        blueNumbers: blueNumbers.length ? blueNumbers : undefined,
+        betAmount: addForm.betAmount,
+      });
+      Toast({ message: "保存成功", theme: "success" });
+    }
     showAddSheet.value = false;
     fetchTickets(true);
   } catch {
@@ -1206,6 +1229,22 @@ async function handleFormSubmit({ valid, firstError }: any) {
   } finally {
     addLoading.value = false;
   }
+}
+
+// 打开编辑弹窗
+function openEditDialog(ticket: DrawTicket) {
+  isEditingTicket.value = true;
+  editingTicketId.value = ticket.id;
+  addForm.modeId = ticket.modeId;
+  addForm.issueNo = ticket.issueNo || "";
+  addForm.redNumbersInput = Array.isArray(ticket.redNumbers)
+    ? ticket.redNumbers.join(",")
+    : String(ticket.redNumbers || "");
+  addForm.blueNumbersInput = Array.isArray(ticket.blueNumbers)
+    ? ticket.blueNumbers.join(",")
+    : String(ticket.blueNumbers || "");
+  addForm.betAmount = Number(ticket.betAmount);
+  showAddSheet.value = true;
 }
 
 async function handleGenerate() {
