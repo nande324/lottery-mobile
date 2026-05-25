@@ -1,7 +1,7 @@
 <template>
   <div class="scratch-view">
     <div class="action-bar">
-      <t-button theme="primary" size="small" @click="showAddSheet = true">
+      <t-button theme="primary" size="small" @click="openAddSheet()">
         <template #icon><t-icon name="add" /></template>
         新增记录
       </t-button>
@@ -89,13 +89,11 @@
           <t-icon name="close" @click="showAddSheet = false" />
         </div>
         <t-cell-group bordered>
-          <t-cell title="刮奖日期">
+          <t-cell title="刮奖日期" @click="openDatePicker">
             <template #note>
-              <t-input
-                v-model="form.scratchDate"
-                placeholder="YYYY-MM-DD"
-                style="text-align: right"
-              />
+              <span class="picker-value">{{
+                form.scratchDate || "请选择"
+              }}</span>
             </template>
           </t-cell>
           <t-cell title="类型">
@@ -148,11 +146,26 @@
         </div>
       </div>
     </t-popup>
+
+    <!-- 日期选择器 -->
+    <t-popup v-model:visible="showDatePicker" placement="bottom">
+      <div class="mode-picker-header">
+        <span>选择日期</span>
+        <t-icon name="close" @click="showDatePicker = false" />
+      </div>
+      <t-date-picker
+        :value="form.scratchDate || ''"
+        :disable-date="{ after: todayStr }"
+        @confirm="onDateConfirm"
+        @cancel="showDatePicker = false"
+        @change="onDateChange"
+      />
+    </t-popup>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from "vue";
+import { ref, reactive, computed, onMounted } from "vue";
 import { Toast } from "tdesign-mobile-vue";
 import { scratchTicketApi } from "@/api";
 
@@ -172,6 +185,7 @@ const tickets = ref<ScratchTicket[]>([]);
 const page = ref(1);
 const hasMore = ref(false);
 const showAddSheet = ref(false);
+const showDatePicker = ref(false);
 const isEditing = ref(false);
 const currentId = ref<number | null>(null);
 const submitLoading = ref(false);
@@ -182,6 +196,34 @@ const form = reactive({
   winAmount: 0,
   remark: "",
 });
+
+// 今天日期字符串（用于限制日期选择）
+const todayStr = computed(() => formatDate(new Date()));
+
+// 格式化日期为 YYYY-MM-DD
+function formatDate(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+// 打开新增弹窗，默认当前日期
+function openAddSheet() {
+  isEditing.value = false;
+  currentId.value = null;
+  form.scratchDate = formatDate(new Date());
+  form.scratchType = "";
+  form.costAmount = 0;
+  form.winAmount = 0;
+  form.remark = "";
+  showAddSheet.value = true;
+}
+
+// 打开日期选择器
+function openDatePicker() {
+  showDatePicker.value = true;
+}
 
 async function fetchTickets(reset = false) {
   if (reset) {
@@ -251,6 +293,17 @@ async function handleSubmit() {
   } finally {
     submitLoading.value = false;
   }
+}
+
+// 日期变化事件
+function onDateChange(date: Date) {
+  form.scratchDate = formatDate(date);
+}
+
+// 日期选择确认
+function onDateConfirm(context: { date: Date }) {
+  form.scratchDate = formatDate(context.date);
+  showDatePicker.value = false;
 }
 
 async function handleDelete(id: number) {
@@ -325,6 +378,15 @@ onMounted(() => fetchTickets(true));
   padding-bottom: env(safe-area-inset-bottom);
 }
 .popup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  font-size: 16px;
+  font-weight: 600;
+  border-bottom: 1px solid #f0f0f0;
+}
+.mode-picker-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
